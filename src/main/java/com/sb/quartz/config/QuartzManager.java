@@ -1,9 +1,12 @@
 package com.sb.quartz.config;
 
+import com.sb.quartz.util.DateUtil;
+import com.sb.quartz.vo.JobVO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +14,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,11 +43,20 @@ public class QuartzManager implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
+    @Autowired
     private Scheduler scheduler;
 
     @Autowired
     private AutowiringSpringBeanJobFactory autowiringSpringBeanJobFactory;
 
+    /**
+     * @description：执行所有任务
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:05
+     * @mofified By:
+     */
     public void start() {
         //启动所有任务
         try {
@@ -62,6 +77,14 @@ public class QuartzManager implements ApplicationContextAware {
         }
     }
 
+    /**
+     * @description：新增定时计划
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:04
+     * @mofified By:
+     */
     public boolean addJob(String jobName, String jobClass, String cronExp) {
         boolean result = false;
         if (!CronExpression.isValidExpression(cronExp)) {
@@ -79,6 +102,7 @@ public class QuartzManager implements ApplicationContextAware {
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
             scheduler.start();
+            result = true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             logger.error("QuartzManager add job failed");
@@ -86,6 +110,14 @@ public class QuartzManager implements ApplicationContextAware {
         return result;
     }
 
+    /**
+     * @description：修改任务
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:04
+     * @mofified By:
+     */
     public boolean updateJob(String jobName, String cronExp) {
         boolean result = false;
         if (!CronExpression.isValidExpression(cronExp)) {
@@ -115,6 +147,14 @@ public class QuartzManager implements ApplicationContextAware {
         return result;
     }
 
+    /**
+     * @description：删除任务
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:04
+     * @mofified By:
+     */
     public boolean deleteJob(String jobName) {
         boolean result = false;
         JobKey jobKey = new JobKey(jobName, JOB_DEFAULT_GROUP_NAME);
@@ -129,6 +169,62 @@ public class QuartzManager implements ApplicationContextAware {
             logger.error("delete job name:{},group name:{} failed!" + jobKey.getName() + jobKey.getGroup());
         }
         return result;
+    }
+
+    /**
+     * @description：触发任务（立即执行）
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:02
+     * @mofified By:
+     */
+    public boolean triggerJob(String jobName) {
+        boolean result = false;
+        JobKey jobKey = new JobKey(jobName, JOB_DEFAULT_GROUP_NAME);
+        try {
+            if (scheduler.checkExists(jobKey)) {
+                scheduler.triggerJob(jobKey);
+                result = true;
+            } else {
+                logger.error("job not found —— " + jobName);
+            }
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+            logger.error("trigger job name:{},group name:{} failed!" + jobKey.getName() + jobKey.getGroup());
+        }
+        return result;
+    }
+
+    /**
+     * @description：查询正在执行的任务
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:21
+     * @mofified By:
+     */
+    public List<JobVO> findJobs() {
+        List<JobVO> jobVOList = new ArrayList<>();
+        try {
+            for (String groupName : scheduler.getJobGroupNames()) {
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                    JobVO jobVO = new JobVO();
+                    jobVO.setJobName(jobKey.getName());
+                    jobVO.setJobGroup(jobKey.getGroup());
+                    //get job's trigger
+                    List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+                    Date nextFireTime = triggers.get(0).getNextFireTime();
+                    jobVO.setJobNextTime(DateUtil.dateToString(nextFireTime));
+                    jobVOList.add(jobVO);
+                    System.out.println("[jobName] : " + jobKey.getName() + " [groupName] : "
+                            + jobKey.getGroup() + " - " + nextFireTime);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jobVOList;
     }
 
     @Override
