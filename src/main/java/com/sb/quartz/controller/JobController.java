@@ -1,6 +1,7 @@
 package com.sb.quartz.controller;
 
 import com.sb.quartz.config.QuartzManager;
+import com.sb.quartz.util.Constants;
 import com.sb.quartz.util.ResultUtil;
 import com.sb.quartz.vo.JobVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +35,6 @@ public class JobController {
      */
     private static final String JOB_INIT_CRON_EXP = "*/5 * * * * ?";
 
-    /**
-     * 初始化JOB关键字
-     */
-    private static final String JOB_INIT_INIT_JOB = "initJob";
-
     @Autowired
     QuartzManager quartzManager;
 
@@ -52,7 +48,7 @@ public class JobController {
      */
     @RequestMapping(value = "/initJob", method = RequestMethod.GET)
     public ResultUtil initJob() {
-        if(quartzManager.addJob(JOB_INIT_INIT_JOB, JOB_INIT_INI_JOB, JOB_INIT_CRON_EXP)) {
+        if(quartzManager.addJob(Constants.JOB_INIT_INIT_JOB, JOB_INIT_INI_JOB, JOB_INIT_CRON_EXP)) {
             return new ResultUtil.Builder<>().success("初始化任务成功").build();
         } else {
             return new ResultUtil.Builder<>().failure("初始化任务失败").build();
