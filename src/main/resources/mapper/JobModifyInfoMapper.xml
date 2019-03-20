@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sb.quartz.mapper.JobModifyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.sb.quartz.po.JobModifyInfo">
+    <id column="JOB_MODIFY_ID" jdbcType="VARCHAR" property="jobModifyId" />
+    <result column="JOB_ID" jdbcType="VARCHAR" property="jobId" />
+    <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+    <result column="BEFORE_EXP" jdbcType="VARCHAR" property="beforeExp" />
+    <result column="AFTER_EXP" jdbcType="VARCHAR" property="afterExp" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    JOB_MODIFY_ID, JOB_ID, DESCRIPTION, BEFORE_EXP, AFTER_EXP, CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from job_modify_info
+    where JOB_MODIFY_ID = #{jobModifyId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from job_modify_info
+    where JOB_MODIFY_ID = #{jobModifyId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.sb.quartz.po.JobModifyInfo">
+    insert into job_modify_info (JOB_MODIFY_ID, JOB_ID, DESCRIPTION, 
+      BEFORE_EXP, AFTER_EXP, CREATE_TIME
+      )
+    values (#{jobModifyId,jdbcType=VARCHAR}, #{jobId,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{beforeExp,jdbcType=VARCHAR}, #{afterExp,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.sb.quartz.po.JobModifyInfo">
+    insert into job_modify_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="jobModifyId != null">
+        JOB_MODIFY_ID,
+      </if>
+      <if test="jobId != null">
+        JOB_ID,
+      </if>
+      <if test="description != null">
+        DESCRIPTION,
+      </if>
+      <if test="beforeExp != null">
+        BEFORE_EXP,
+      </if>
+      <if test="afterExp != null">
+        AFTER_EXP,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="jobModifyId != null">
+        #{jobModifyId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null">
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeExp != null">
+        #{beforeExp,jdbcType=VARCHAR},
+      </if>
+      <if test="afterExp != null">
+        #{afterExp,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sb.quartz.po.JobModifyInfo">
+    update job_modify_info
+    <set>
+      <if test="jobId != null">
+        JOB_ID = #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeExp != null">
+        BEFORE_EXP = #{beforeExp,jdbcType=VARCHAR},
+      </if>
+      <if test="afterExp != null">
+        AFTER_EXP = #{afterExp,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where JOB_MODIFY_ID = #{jobModifyId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sb.quartz.po.JobModifyInfo">
+    update job_modify_info
+    set JOB_ID = #{jobId,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      BEFORE_EXP = #{beforeExp,jdbcType=VARCHAR},
+      AFTER_EXP = #{afterExp,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where JOB_MODIFY_ID = #{jobModifyId,jdbcType=VARCHAR}
+  </update>
+</mapper>

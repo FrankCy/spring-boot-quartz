@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sb.quartz.mapper.JobMainMapper">
+  <resultMap id="BaseResultMap" type="com.sb.quartz.po.JobMain">
+    <id column="JOB_ID" jdbcType="VARCHAR" property="jobId" />
+    <result column="JOB_NAME" jdbcType="VARCHAR" property="jobName" />
+    <result column="JOB_GROUP" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="CRO_EXP" jdbcType="VARCHAR" property="croExp" />
+    <result column="IS_USE" jdbcType="VARCHAR" property="isUse" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="LAST_EXECUTE_TIME" jdbcType="TIMESTAMP" property="lastExecuteTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    JOB_ID, JOB_NAME, JOB_GROUP, CRO_EXP, IS_USE, CREATE_TIME, UPDATE_TIME, LAST_EXECUTE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from job_main
+    where JOB_ID = #{jobId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from job_main
+    where JOB_NAME = #{jobName,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from job_main
+    where JOB_ID = #{jobId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.sb.quartz.po.JobMain">
+    insert into job_main (JOB_ID, JOB_NAME, JOB_GROUP, 
+      CRO_EXP, IS_USE, CREATE_TIME, 
+      UPDATE_TIME, LAST_EXECUTE_TIME)
+    values (#{jobId,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, #{jobGroup,jdbcType=VARCHAR}, 
+      #{croExp,jdbcType=VARCHAR}, #{isUse,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{lastExecuteTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sb.quartz.po.JobMain">
+    insert into job_main
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="jobId != null">
+        JOB_ID,
+      </if>
+      <if test="jobName != null">
+        JOB_NAME,
+      </if>
+      <if test="jobGroup != null">
+        JOB_GROUP,
+      </if>
+      <if test="croExp != null">
+        CRO_EXP,
+      </if>
+      <if test="isUse != null">
+        IS_USE,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="lastExecuteTime != null">
+        LAST_EXECUTE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="jobId != null">
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobName != null">
+        #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="jobGroup != null">
+        #{jobGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="croExp != null">
+        #{croExp,jdbcType=VARCHAR},
+      </if>
+      <if test="isUse != null">
+        #{isUse,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastExecuteTime != null">
+        #{lastExecuteTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sb.quartz.po.JobMain">
+    update job_main
+    <set>
+      <if test="jobName != null">
+        JOB_NAME = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="jobGroup != null">
+        JOB_GROUP = #{jobGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="croExp != null">
+        CRO_EXP = #{croExp,jdbcType=VARCHAR},
+      </if>
+      <if test="isUse != null">
+        IS_USE = #{isUse,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastExecuteTime != null">
+        LAST_EXECUTE_TIME = #{lastExecuteTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where JOB_ID = #{jobId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sb.quartz.po.JobMain">
+    update job_main
+    set JOB_NAME = #{jobName,jdbcType=VARCHAR},
+      JOB_GROUP = #{jobGroup,jdbcType=VARCHAR},
+      CRO_EXP = #{croExp,jdbcType=VARCHAR},
+      IS_USE = #{isUse,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      LAST_EXECUTE_TIME = #{lastExecuteTime,jdbcType=TIMESTAMP}
+    where JOB_ID = #{jobId,jdbcType=VARCHAR}
+  </update>
+</mapper>

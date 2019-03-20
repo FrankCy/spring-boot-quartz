@@ -1,5 +1,6 @@
 package com.sb.quartz.config;
 
+import com.sb.quartz.util.Constants;
 import com.sb.quartz.util.DateUtil;
 import com.sb.quartz.vo.JobVO;
 import org.apache.commons.logging.Log;
@@ -36,10 +37,6 @@ public class QuartzManager implements ApplicationContextAware {
     private static final Log logger = LogFactory.getLog(QuartzManager.class);
 
     private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-
-    private static final String JOB_DEFAULT_GROUP_NAME = "JOB_DEFAULT_GROUP_NAME";
-
-    private static final String TRIGGER_DEFAULT_GROUP_NAME = "TRIGGER_DEFAULT_GROUP_NAME";
 
     private ApplicationContext applicationContext;
 
@@ -92,13 +89,13 @@ public class QuartzManager implements ApplicationContextAware {
             return result;
         }
         try {
-            JobDetail jobDetail = JobBuilder.newJob().withIdentity(new JobKey(jobName, JOB_DEFAULT_GROUP_NAME))
+            JobDetail jobDetail = JobBuilder.newJob().withIdentity(new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME))
                     .ofType((Class<Job>) Class.forName(jobClass))
                     .build();
             Trigger trigger = TriggerBuilder.newTrigger()
                     .forJob(jobDetail)
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
-                    .withIdentity(new TriggerKey(jobName, TRIGGER_DEFAULT_GROUP_NAME))
+                    .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
             scheduler.start();
@@ -124,15 +121,15 @@ public class QuartzManager implements ApplicationContextAware {
             logger.error("Illegal cron expression format({})" + cronExp);
             return result;
         }
-        JobKey jobKey = new JobKey(jobName, JOB_DEFAULT_GROUP_NAME);
-        TriggerKey triggerKey = new TriggerKey(jobName, TRIGGER_DEFAULT_GROUP_NAME);
+        JobKey jobKey = new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME);
+        TriggerKey triggerKey = new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME);
         try {
             if (scheduler.checkExists(jobKey) && scheduler.checkExists(triggerKey)) {
                 JobDetail jobDetail = scheduler.getJobDetail(jobKey);
                 Trigger newTrigger = TriggerBuilder.newTrigger()
                         .forJob(jobDetail)
                         .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
-                        .withIdentity(new TriggerKey(jobName, TRIGGER_DEFAULT_GROUP_NAME))
+                        .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
                         .build();
                 scheduler.rescheduleJob(triggerKey, newTrigger);
                 result = true;
@@ -157,7 +154,7 @@ public class QuartzManager implements ApplicationContextAware {
      */
     public boolean deleteJob(String jobName) {
         boolean result = false;
-        JobKey jobKey = new JobKey(jobName, JOB_DEFAULT_GROUP_NAME);
+        JobKey jobKey = new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME);
         try {
             if (scheduler.checkExists(jobKey)) {
                 result = scheduler.deleteJob(jobKey);
@@ -181,7 +178,7 @@ public class QuartzManager implements ApplicationContextAware {
      */
     public boolean triggerJob(String jobName) {
         boolean result = false;
-        JobKey jobKey = new JobKey(jobName, JOB_DEFAULT_GROUP_NAME);
+        JobKey jobKey = new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME);
         try {
             if (scheduler.checkExists(jobKey)) {
                 scheduler.triggerJob(jobKey);

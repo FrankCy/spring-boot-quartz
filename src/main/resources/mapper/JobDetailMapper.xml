@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sb.quartz.mapper.JobDetailMapper">
+  <resultMap id="BaseResultMap" type="com.sb.quartz.po.JobDetail">
+    <id column="JOB_DETAIL_ID" jdbcType="VARCHAR" property="jobDetailId" />
+    <result column="JOB_ID" jdbcType="VARCHAR" property="jobId" />
+    <result column="DATA" jdbcType="VARCHAR" property="data" />
+    <result column="EXECUTE_TIME" jdbcType="TIMESTAMP" property="executeTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    JOB_DETAIL_ID, JOB_ID, DATA, EXECUTE_TIME, CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from job_detail
+    where JOB_DETAIL_ID = #{jobDetailId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from job_detail
+    where JOB_DETAIL_ID = #{jobDetailId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.sb.quartz.po.JobDetail">
+    insert into job_detail (JOB_DETAIL_ID, JOB_ID, DATA, 
+      EXECUTE_TIME, CREATE_TIME)
+    values (#{jobDetailId,jdbcType=VARCHAR}, #{jobId,jdbcType=VARCHAR}, #{data,jdbcType=VARCHAR}, 
+      #{executeTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sb.quartz.po.JobDetail">
+    insert into job_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="jobDetailId != null">
+        JOB_DETAIL_ID,
+      </if>
+      <if test="jobId != null">
+        JOB_ID,
+      </if>
+      <if test="data != null">
+        DATA,
+      </if>
+      <if test="executeTime != null">
+        EXECUTE_TIME,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="jobDetailId != null">
+        #{jobDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="jobId != null">
+        #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="data != null">
+        #{data,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTime != null">
+        #{executeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sb.quartz.po.JobDetail">
+    update job_detail
+    <set>
+      <if test="jobId != null">
+        JOB_ID = #{jobId,jdbcType=VARCHAR},
+      </if>
+      <if test="data != null">
+        DATA = #{data,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTime != null">
+        EXECUTE_TIME = #{executeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where JOB_DETAIL_ID = #{jobDetailId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sb.quartz.po.JobDetail">
+    update job_detail
+    set JOB_ID = #{jobId,jdbcType=VARCHAR},
+      DATA = #{data,jdbcType=VARCHAR},
+      EXECUTE_TIME = #{executeTime,jdbcType=TIMESTAMP},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where JOB_DETAIL_ID = #{jobDetailId,jdbcType=VARCHAR}
+  </update>
+</mapper>
