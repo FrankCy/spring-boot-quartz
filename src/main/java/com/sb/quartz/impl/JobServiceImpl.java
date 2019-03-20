@@ -1,6 +1,8 @@
 package com.sb.quartz.impl;
 
 import com.sb.quartz.service.JobService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,6 +19,8 @@ import java.util.Date;
  */
 @Service
 public class JobServiceImpl implements JobService {
+
+    private static final Log logger = LogFactory.getLog(JobServiceImpl.class);
 
     @Override
     public void testTask() {
