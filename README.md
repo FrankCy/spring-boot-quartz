@@ -432,3 +432,143 @@ public class JobServiceImpl implements JobService {
     }
 }
 ```
+
+# Spring Boot Quartz 实战 #
+## 说明 ##
+- **使用Quartz实现动态传递参数并触发定时**
+- **使用Quartz实现重试次数和开始时间**
+## 示例：动态传参并触发 ##
+### Controller ###
+```java
+@RequestMapping(value = "/paramQuartzTest", method = RequestMethod.POST)
+    public ResultUtil investUnLock(@RequestParam("id") String id) {
+        // 封装JSON，将所有传参都放入JSON，并转为String进行传递
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        // 调用QuartzManager进行addJob(含参数）
+        if(quartzManager.addJob(Constants.JOB_PARAM, Constants.PARAM_JOB_SERVICE_TRIGGER, Constants.PARAM_JOB_CRON_EXP, jsonObject.toJSONString())) {
+            return new ResultUtil.Builder<>().success("定时创建成功").build();
+        } else {
+            return new ResultUtil.Builder<>().failure("定时创建失败").build();
+        }
+    }
+```
+### Quartz Manager ###
+```java
+public boolean addJob(String jobName, String jobClass, String cronExp, String jsonData) {
+        boolean result = false;
+        if (!CronExpression.isValidExpression(cronExp)) {
+            logger.error("Illegal cron expression format({})" + cronExp);
+            return result;
+        }
+        try {
+            // 初始化定时明细
+            JobDetail jobDetail = JobBuilder.newJob()
+                    .withIdentity(new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME))
+                    // 参数封装到'data'内
+                    .usingJobData("data", jsonData)
+                    .ofType((Class<Job>) Class.forName(jobClass))
+                    .build();
+            // 触发任务
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .forJob(jobDetail)
+                    .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
+                    .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+            result = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            logger.error("QuartzManager add job failed");
+        }
+        return result;
+    }
+```
+### implements Job ###
+```java
+public class ParamJob implements Job {
+
+    private static final Log logger = LogFactory.getLog(ParamJob.class);
+
+    @Autowired
+    protected ParamJobService paramJobServiceImpl;
+
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) {
+        try {
+            // 从定时中获取参数
+            String jsonData = jobExecutionContext.getMergedJobDataMap().getString("data");
+            logger.info("jsonData : " + jsonData);
+            // 解析
+            JSONObject jsonObject = JSONObject.parseObject(jsonData);
+            // 调用含参数定时，并传递参数
+            paramJobServiceImpl.paramQuartzDemo(jsonObject.getString("id"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+```
+## 示例：设置重试次数和开始时间 ##
+### Quartz Manager ###
+**```关键代码：```**
+```java
+
+/**
+ * @description：新增定时计划【包含参数，设置重试】
+ * @version 1.0
+ * @mofified By:
+ * @param jobName
+ * @param jobClass
+ * @param starTime 开始时间 秒
+ * @param jsonData 参数
+ * @param tautologyNum 重试次数
+ */
+public boolean addJob(String jobName, String jobClass, int starTime, String jsonData, int tautologyNum) {
+        boolean result = false;
+        if (starTime <= 0) {
+            logger.error("时间错误" + starTime);
+            return result;
+        }
+        try {
+            // 初始化定时明细
+            JobDetail jobDetail = JobBuilder.newJob()
+                    .withIdentity(new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME))
+                    // 参数封装到'data'内
+                    .usingJobData("data", jsonData)
+                    .ofType((Class<Job>) Class.forName(jobClass))
+                    .build();
+            // 触发任务
+            SimpleTrigger trigger = TriggerBuilder.newTrigger()
+                    // 定义名字和组
+                    .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
+                    .withSchedule(
+                            //定义任务调度的时间间隔和次数
+                            SimpleScheduleBuilder
+                                    .simpleSchedule()
+                                    //定义时间间隔是多少秒
+                                    .withIntervalInSeconds(starTime)
+                                    //定义重复执行次数
+                                    .withRepeatCount(tautologyNum)
+                    )
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+            result = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            logger.error("QuartzManager add job failed");
+        }
+        return result;
+    }
+```
+
+# 项目相关 #
+[项目地址 - GItHub spring-boot-quartz ](https://github.com/FrankCy/spring-boot-quartz)
+- - -
+[CSDN - Spring Boot Quartz 实现动态创建](https://blog.csdn.net/Cy_LightBule/article/details/88697675)
+- - -
+[CSDN - Spring Boot 实现定时任务](https://blog.csdn.net/Cy_LightBule/article/details/88670489)

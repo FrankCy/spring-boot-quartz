@@ -107,7 +107,6 @@ public class QuartzManager implements ApplicationContextAware {
         return result;
     }
 
-
     /**
      * @description：新增定时计划【包含参数】
      * @version 1.0
@@ -135,6 +134,57 @@ public class QuartzManager implements ApplicationContextAware {
                     .forJob(jobDetail)
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
                     .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+            result = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            logger.error("QuartzManager add job failed");
+        }
+        return result;
+    }
+
+    /**
+     * @description：新增定时计划【包含参数】
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:04
+     * @mofified By:
+     * @param jobName
+     * @param jobClass
+     * @param starTime 开始时间 秒
+     * @param jsonData 参数
+     * @param tautologyNum 重试次数
+     */
+    public boolean addJob(String jobName, String jobClass, int starTime, String jsonData, int tautologyNum) {
+        boolean result = false;
+        if (starTime <= 0) {
+            logger.error("时间错误" + starTime);
+            return result;
+        }
+        try {
+            // 初始化定时明细
+            JobDetail jobDetail = JobBuilder.newJob()
+                    .withIdentity(new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME))
+                    // 参数封装到'data'内
+                    .usingJobData("data", jsonData)
+                    .ofType((Class<Job>) Class.forName(jobClass))
+                    .build();
+            // 触发任务
+            SimpleTrigger trigger = TriggerBuilder.newTrigger()
+                    // 定义名字和组
+                    .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
+                    .withSchedule(
+                            //定义任务调度的时间间隔和次数
+                            SimpleScheduleBuilder
+                                    .simpleSchedule()
+                                    //定义时间间隔是多少秒
+                                    .withIntervalInSeconds(starTime)
+                                    //定义重复执行次数
+                                    .withRepeatCount(tautologyNum)
+                    )
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
             scheduler.start();
