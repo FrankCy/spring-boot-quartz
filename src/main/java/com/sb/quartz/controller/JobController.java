@@ -25,16 +25,6 @@ import java.util.List;
 @RestController
 public class JobController {
 
-    /**
-     * 初始化定时任务实体
-     */
-    private static final String JOB_INIT_INI_JOB = "com.sb.quartz.job.JobInit";
-
-    /**
-     * 5s/次
-     */
-    private static final String JOB_INIT_CRON_EXP = "*/5 * * * * ?";
-
     @Autowired
     QuartzManager quartzManager;
 
@@ -48,7 +38,7 @@ public class JobController {
      */
     @RequestMapping(value = "/initJob", method = RequestMethod.GET)
     public ResultUtil initJob() {
-        if(quartzManager.addJob(Constants.JOB_INIT_INIT_JOB, JOB_INIT_INI_JOB, JOB_INIT_CRON_EXP)) {
+        if(quartzManager.addJob(Constants.JOB_INIT_INIT_JOB, Constants.JOB_INIT_INI_JOB, Constants.JOB_INIT_CRON_EXP)) {
             return new ResultUtil.Builder<>().success("初始化任务成功").build();
         } else {
             return new ResultUtil.Builder<>().failure("初始化任务失败").build();

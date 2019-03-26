@@ -107,6 +107,45 @@ public class QuartzManager implements ApplicationContextAware {
         return result;
     }
 
+
+    /**
+     * @description：新增定时计划【包含参数】
+     * @version 1.0
+     * @author: Yang.Chang
+     * @email: cy880708@163.com
+     * @date: 2019/3/20 下午3:04
+     * @mofified By:
+     */
+    public boolean addJob(String jobName, String jobClass, String cronExp, String jsonData) {
+        boolean result = false;
+        if (!CronExpression.isValidExpression(cronExp)) {
+            logger.error("Illegal cron expression format({})" + cronExp);
+            return result;
+        }
+        try {
+            // 初始化定时明细
+            JobDetail jobDetail = JobBuilder.newJob()
+                    .withIdentity(new JobKey(jobName, Constants.JOB_DEFAULT_GROUP_NAME))
+                    // 参数封装到'data'内
+                    .usingJobData("data", jsonData)
+                    .ofType((Class<Job>) Class.forName(jobClass))
+                    .build();
+            // 触发任务
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .forJob(jobDetail)
+                    .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
+                    .withIdentity(new TriggerKey(jobName, Constants.TRIGGER_DEFAULT_GROUP_NAME))
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+            result = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            logger.error("QuartzManager add job failed");
+        }
+        return result;
+    }
+
     /**
      * @description：修改任务
      * @version 1.0

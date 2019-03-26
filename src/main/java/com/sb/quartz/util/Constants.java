@@ -27,4 +27,27 @@ public class Constants {
      */
     public static final String TRIGGER_DEFAULT_GROUP_NAME = "TRIGGER_DEFAULT_GROUP_NAME";
 
+    /**
+     * 默认启动定时主键
+     */
+    public static final String JOB_PARAM = "paramJob";
+
+    /**
+     * 带参数定时触发器
+     */
+    public static final String PARAM_JOB_SERVICE_TRIGGER = "com.sb.quartz.job.ParamJob";
+    /**
+     * 带参数定时任务Cron
+     */
+    public static final String PARAM_JOB_CRON_EXP = "*/10 * * * * ?";
+
+    /**
+     * 初始化定时任务实体
+     */
+    public static final String JOB_INIT_INI_JOB = "com.sb.quartz.job.JobInit";
+
+    /**
+     * 5s/次
+     */
+    public static final String JOB_INIT_CRON_EXP = "*/5 * * * * ?";
 }
